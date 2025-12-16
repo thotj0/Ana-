@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>💕 ANA 💕</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+<link rel="icon" href="musica.ico" type="image/x-icon">
+
+
+<style>
+:root{
+  --apple:#A7E888;      /* verde manzana suave */
+  --apple-strong:#6FBF44; 
+  --rose:#F6B7C5;       /* rosa pastel acuarela */
+  --plume:#8F5E74;      /* ciruela viejo */
+  --cream:#FCE9EC;      /* rosa algodón */
+  --paper:#FFFDF7;
+  --wood:#c4986a;
+  --metal:#3b3b3b;
+  --shadow: rgba(10,10,10,0.14);
+}
+
+/* reset & base */
+*{box-sizing:border-box}
+html,body{height:100%; margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+body{
+  background: linear-gradient(135deg, #fff7fa 0%, #f7fff4 50%, #f0fff7 100%);
+  color:var(--plume);
+  padding:20px;
+  display:flex; justify-content:center;
+}
+
+/* container */
+.app{ width:min(1100px,96vw); display:flex; flex-direction:column; gap:18px; align-items:stretch; }
+
+/* decorative watercolor flowers (background) */
+.page-decor{ position:fixed; inset:0; pointer-events:none; z-index:0; }
+.flower-l{ position:absolute; left:-6%; top:-4%; width:340px; opacity:0.12; filter: blur(6px); transform:rotate(-10deg); }
+.flower-r{ position:absolute; right:-8%; bottom:-6%; width:420px; opacity:0.12; filter: blur(8px); transform:rotate(20deg); }
+
+/* floating apple bubbles */
+#bubblesContainer{ position:fixed; inset:0; pointer-events:none; z-index:1; }
+
+/* top layout */
+.top { display:grid; grid-template-columns: 1fr 420px; gap:18px; z-index:2; }
+@media (max-width:980px){ .top { grid-template-columns:1fr; } }
+
+/* PLAYER card */
+.player {
+  background: linear-gradient(180deg,var(--paper), #fffaf0);
+  border-radius:14px; padding:14px; box-shadow:0 28px 50px var(--shadow);
+  border:10px solid var(--wood);
+  display:flex; flex-direction:column; gap:12px; position:relative;
+}
+
+/* top bar */
+.header { display:flex; justify-content:space-between; align-items:center; }
+.header h1{ margin:0; font-family:'Dancing Script', cursive; color:var(--apple-strong); font-size:1.1rem; }
+.header .meta{ font-size:12px; color:#6c4f63; }
+
+/* turntable area */
+.tt-top{ width:100%; max-width:560px; aspect-ratio:1/1; border-radius:12px; padding:16px; background: linear-gradient(180deg,#fffdf9,#f6f7ef); display:flex; align-items:center; justify-content:center; position:relative; transform-style:preserve-3d; box-shadow: inset 0 8px 16px rgba(0,0,0,0.03); }
+.platter-holder{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; position:relative; }
+.platter{ width:64%; aspect-ratio:1/1; border-radius:50%; background: radial-gradient(circle at 33% 30%, #050509 0%, #121212 45%, #292929 100%); box-shadow: 0 18px 38px rgba(0,0,0,0.36), inset 0 6px 18px rgba(255,255,255,0.02); display:flex; align-items:center; justify-content:center; position:relative; transform-origin:50% 50%; will-change: transform; }
+.platter.playing{ animation:spin 4s linear infinite; }
+@keyframes spin{ from{transform:rotateZ(0);} to{transform:rotateZ(360deg);} }
+
+.label{ width:34%; aspect-ratio:1/1; border-radius:50%; overflow:hidden; background: radial-gradient(circle,#fff7f8,#ffdff0); border:4px solid rgba(0,0,0,0.06); transform:translateZ(8px); box-shadow:0 8px 18px rgba(0,0,0,0.24); display:flex; align-items:center; justify-content:center; }
+.label img{ width:100%; height:100%; object-fit:cover; filter:brightness(1.02) saturate(1.04); }
+
+/* spindle */
+.spindle{ width:8%; aspect-ratio:1/1; border-radius:50%; background: linear-gradient(180deg,#efefef,#bdbdbd); position:absolute; z-index:6; box-shadow:0 3px 8px rgba(0,0,0,0.18); }
+
+/* tonearm */
+.tonearm{ width:56%; height:6px; background: linear-gradient(180deg,#444,#222); position:absolute; top:18%; right:12%; transform-origin:10% 50%; transform:rotate(-40deg); border-radius:6px; box-shadow:0 6px 10px rgba(0,0,0,0.2); z-index:8; transition: transform .12s cubic-bezier(.2,.9,.2,1); }
+.tonearm::after{ content:""; position:absolute; width:40px; height:18px; right:-34px; top:-6px; background: linear-gradient(180deg,#bdb09f,#8f7c6b); border-radius:6px; box-shadow:0 4px 8px rgba(0,0,0,0.08); }
+.cartridge{ position:absolute; right:-48px; top:-8px; width:14px; height:22px; background: linear-gradient(180deg,#111,#222); border-radius:3px; box-shadow:0 3px 6px rgba(0,0,0,0.3); }
+
+/* controls integrated */
+.controls-panel{ width:calc(100% - 28px); background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.98)); border-radius:12px; padding:10px; display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:8px; }
+.controls-left{ display:flex; gap:8px; align-items:center; }
+.btn{ width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; background: linear-gradient(180deg,#fff,#f4fff2); border: 4px solid var(--wood); box-shadow: 0 8px 14px rgba(0,0,0,0.12); cursor:pointer;}
+.btn:active{ transform:translateY(2px); }
+.btn svg{ width:24px; height:24px; fill:var(--metal); }
+.btn.playing{ background: linear-gradient(180deg,#eaffd8,#dfffbe); border-color:var(--apple); box-shadow:0 8px 20px rgba(123,210,100,0.10); }
+
+.select{ appearance:none; border:none; padding:10px 12px; border-radius:10px; background: linear-gradient(180deg,#fff,#f7ffef); font-weight:700; box-shadow: inset 0 2px 6px rgba(0,0,0,0.04); }
+
+/* progress */
+.progress-wrap{ flex:1; margin:0 12px; display:flex; align-items:center; gap:8px; }
+input[type="range"]{ -webkit-appearance:none; appearance:none; width:100%; background:transparent; }
+input[type="range"]::-webkit-slider-runnable-track{ height:8px; background: linear-gradient(90deg,var(--apple), var(--apple-strong)); border-radius:8px; }
+input[type="range"]::-webkit-slider-thumb{ -webkit-appearance:none; width:18px; height:18px; background:#fff; border:3px solid #fff; border-radius:50%; box-shadow:0 6px 12px rgba(0,0,0,0.18); margin-top:-5px; }
+
+/* perillas (sensitivity knob & volume perilla style B translucent green) */
+.knob-wrap{ display:flex; gap:8px; align-items:center; padding:6px; border-radius:10px; background:linear-gradient(180deg,#fff,#f6fff4); border:1px solid rgba(0,0,0,0.03); }
+.knob{ width:44px; height:44px; border-radius:50%; background:linear-gradient(180deg,#fff,#f2fff0); border:3px solid var(--wood); display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; box-shadow:0 6px 10px rgba(0,0,0,0.06); }
+.knob .dot{ width:6px; height:6px; background:var(--apple); border-radius:50%; transform:translateY(-12px); box-shadow:0 2px 6px rgba(0,0,0,0.12); }
+
+/* volume perilla (translucent green manzana) */
+.perilla{
+  width:58px; height:58px; border-radius:50%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.85), rgba(255,255,255,0.6)), linear-gradient(180deg, rgba(167,232,136,0.65), rgba(111,191,68,0.35)); border:3px solid rgba(255,255,255,0.6); display:flex; align-items:center; justify-content:center; cursor:pointer;
+  box-shadow: 0 10px 20px rgba(95,160,60,0.08); position:relative;
+}
+.perilla .mark{ width:6px; height:6px; background:rgba(255,255,255,0.95); border-radius:50%; transform:translateY(-18px) }
+
+/* side-right (heart + cohete) */
+.side-right{
+  background: linear-gradient(180deg,#ffffff,#f7fff4);
+  border-radius:14px; padding:14px; box-shadow:0 18px 36px rgba(0,0,0,0.06); border:8px solid rgba(255,255,255,0.85);
+  display:flex; flex-direction:column; gap:12px; align-items:center; z-index:3;
+}
+.heart-wrap{ display:flex; gap:12px; align-items:center; justify-content:center; width:100%; }
+.heart-canvas{ width:300px; height:260px; background:transparent; display:block; }
+
+/* poem inline & rocket style */
+.poem-inline{ font-family:'Dancing Script', cursive; font-size:1.06rem; color:#2b6b30; padding:8px 12px; border-radius:12px; background: rgba(167,232,136,0.10); border:1px solid rgba(111,191,68,0.12); text-align:center; }
+.rocket{ width:96px; height:96px; display:flex; align-items:center; justify-content:center; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.06)); }
+
+/* bottom boat section */
+.boat-section{ background: linear-gradient(180deg,#fffdf9,#f6f7ef); border-radius:14px; padding:14px; box-shadow:0 18px 36px rgba(0,0,0,0.06); border:8px solid #e9d5b7; display:flex; gap:12px; align-items:center; justify-content:space-between; }
+.boat-canvas{ width:65%; height:140px; background:transparent; }
+.boat-text{ width:32%; font-family:'Dancing Script', cursive; font-size:1.04rem; color:#1b5e20; }
+
+/* images row */
+.images-row{ display:flex; gap:10px; justify-content:center; margin-top:6px; }
+.img-item{ width:84px; height:84px; border-radius:50%; overflow:hidden; border:6px solid rgba(255,255,255,0.8); box-shadow:0 10px 18px rgba(0,0,0,0.08); background:#fff; }
+.img-item img{ width:100%; height:100%; object-fit:cover; display:block; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.06)); }
+
+/* messages area */
+.messages{ display:flex; flex-direction:column; gap:10px; min-height:120px; align-items:center; justify-content:center; }
+
+/* write message box */
+.write-row{ display:flex; gap:8px; align-items:center; justify-content:center; margin-top:10px; }
+.write-area{ display:none; gap:8px; align-items:center; justify-content:center; width:100%; }
+.write-area textarea{ width:100%; min-height:72px; border-radius:10px; padding:10px; border:1px solid rgba(0,0,0,0.06); }
+
+/* loading overlay */
+.loading-overlay{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.6); border-radius:12px; z-index:40; opacity:0; pointer-events:none; transition:opacity .25s ease; }
+.loading-overlay.show{ opacity:1; pointer-events:auto; }
+.loading-box{ background:linear-gradient(180deg,#fff,#f7fff4); padding:12px 16px; border-radius:12px; border:1px solid rgba(0,0,0,0.03); box-shadow:0 8px 24px rgba(0,0,0,0.08); font-weight:700; color:#5a4b5f; }
+
+/* floating icons initial class */
+.floating{ position:fixed; top:-5vh; pointer-events:none; font-size:1.4rem; animation: fall linear infinite; }
+@keyframes fall{ to{ transform: translateY(120vh) rotate(360deg); opacity:0 } }
+
+/* small text */
+.small{ font-size:12px; color:#6a4a58; text-align:center; }
+
+@media (max-width:700px){
+  .controls-panel{ flex-direction:column; gap:8px; align-items:stretch; }
+  .boat-section{ flex-direction:column; align-items:center; }
+  .boat-text{ width:100%; text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-decor" aria-hidden="true">
+  <!-- simple SVG washes -->
+  <img class="flower-l" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><g><circle cx='120' cy='120' r='110' fill='%23ffd6ea' opacity='0.9'/></g></svg>" alt="">
+  <img class="flower-r" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='700' height='700'><g><circle cx='520' cy='520' r='180' fill='%23dfffe2' opacity='0.9'/></g></svg>" alt="">
+</div>
+
+<div id="bubblesContainer" aria-hidden="true"></div>
+
+<div class="app">
+  <div class="top">
+
+    <!-- LEFT: Player -->
+    <div class="player" role="region" aria-label="Reproductor">
+      <div class="header">
+        <h1>💕💕 ANA 💕💕</h1>
+        <div class="meta"></div>
+      </div>
+
+      <div class="tt-top" aria-hidden="false">
+        <div class="platter-holder">
+          <div id="platter" class="platter" aria-label="Disco vinilo">
+            <div id="label" class="label"><img id="labelImg" src="" alt="etiqueta"></div>
+            <div class="spindle"></div>
+          </div>
+
+          <div id="tonearm" class="tonearm" role="img" aria-label="aguja">
+            <div class="cartridge"></div>
+          </div>
+
+          <div id="loading" class="loading-overlay" aria-hidden="true">
+            <div class="loading-box">Cargando canción...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-panel" role="toolbar" aria-label="Controles">
+        <div class="controls-left">
+          <div id="btnPrev" class="btn" title="Anterior" aria-label="Anterior">
+            <svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6L11 18zm1-12v12l8.5-6L12 6z"/></svg>
+          </div>
+
+          <div id="btnPlay" class="btn" title="Play/Pausa" aria-label="Reproducir">
+            <svg id="iconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </div>
+
+          <div id="btnNext" class="btn" title="Siguiente" aria-label="Siguiente">
+            <svg viewBox="0 0 24 24"><path d="M13 6v12l8.5-6L13 6zm-1 0L3.5 12 12 18V6z"/></svg>
+          </div>
+
+          <div id="btnShuffle" class="btn" title="Aleatorio" aria-label="Aleatorio">
+            <svg viewBox="0 0 24 24"><path d="M10 6h2.5l3.5 4 4.5-4v12h-2v-7.3l-4.5 4-3.5-4H10l-5 6V6h5z"/></svg>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px; align-items:center; flex:1;">
+          <div style="min-width:160px;">
+            <select id="songSelect" class="select" aria-label="Seleccionar canción"></select>
+          </div>
+
+          <div class="progress-wrap">
+            <input id="progress" type="range" min="0" max="100" step="0.1" value="0" aria-label="Progreso">
+          </div>
+
+          <div style="width:56px; text-align:center; font-size:12px; color:#6a4a58" id="timeLabel">0:00</div>
+
+          <div class="knob-wrap" title="Sensibilidad aguja">
+            <div style="font-size:12px;color:#6a4a58">Sens.</div>
+            <div id="sensKnob" class="knob" aria-label="sensibilidad"><div class="dot"></div></div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="font-size:12px;color:#6a4a58">Vol.</div>
+            <div id="volKnob" class="perilla" title="Volumen" aria-label="Volumen"><div class="mark"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- image placeholders -->
+      <div class="images-row" id="imagesRow" aria-label="imágenes">
+        <div class="img-item"><img src="pelota.png" alt="img1"></div>
+        <div class="img-item"><img src="manzana.png" alt="img2"></div>
+        <div class="img-item"><img src="maripona.png" alt="img3"></div>
+        <div class="img-item"><img src="mango.png" alt="img4"></div>
+      </div>
+
+      <!-- write message (toggle) -->
+      <div class="write-row">
+        <button id="toggleWrite" class="btn" title="Escribir mensaje">✎</button>
+        <div class="small"></div>
+      </div>
+
+      <div class="write-area" id="writeArea">
+        <textarea id="userMessage" placeholder="Escribe aquí tu mensaje..."></textarea>
+        <div style="display:flex; gap:8px; flex-direction:column;">
+          <button id="saveMsg" class="btn" title="Guardar">Guardar</button>
+          <button id="clearMsg" class="btn" title="Borrar">Borrar</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Heart + poem -->
+    <div class="side-right" role="complementary" aria-label="Corazón y frase">
+      <div class="heart-wrap">
+        <canvas id="heartCanvas" class="heart-canvas" width="300" height="260"></canvas>
+
+        
+    
+    </div>
+
+  </div> <!-- end top -->
+
+  <!-- BOTTOM: Boat section -->
+  <div class="boat-section" role="region" aria-label="Barco">
+    <canvas id="boatCanvas" class="boat-canvas" width="640" height="140"></canvas>
+    <div class="boat-text">
+      <div style="font-size:1rem; color:#2a6b30; margin-bottom:6px;">Ven conmigo y Patricio en un viaje en un barco de papel</div>
+      <div style="font-size:0.9rem; color:#476a40;"></div>
+    </div>
+  </div>
+
+</div> <!-- end app -->
+
+<script>
+/* =====================
+   Config & Placeholders
+   ===================== */
+const tracks = [
+  { src: "ana/León Larregui - Locos (128kbit_AAC).mp3", title: "Locos" },
+  { src: "ana/Un Hombre Busca a Una Mujer (128kbit_AAC).mp3", title: "Un Hombre Busca a Una Mujer" },
+  { src: "ana/VOY A CONQUISTARTE LYRIC VIDEO OFICIAL (128kbit_AAC).mp3", title: "VOY A CONQUISTARTE" },
+  { src: "ana/Besame Mucho (128kbit_AAC).mp3", title: "Besame Mucho" },
+  { src: "ana/Café Tacvba - Eres (Video Oficial) (128kbit_AAC).mp3", title: "Eres" },
+  { src: "ana/Enamorado tuyo (128kbit_AAC).mp3", title: "Enamorado tuyo" },
+  { src: "ana/Enjambre - Siempre Tú (128kbit_AAC).mp3", title: "Siempre Tú" },
+  { src: "ana/Hombres G - Te Quiero - Letra (128kbit_AAC).mp3", title: "Te Quiero" },
+  { src: "ana/Jenni Rivera - De Contrabando (Official Video) (128kbit_AAC) copy.mp3", title: "De Contrabando" },
+  { src: "ana/Joan Sebastian - Secreto De Amor (Video Oficial) (128kbit_AAC).mp3", title: "Secreto De Amor" },
+  { src: "ana/La Gloria Eres Tu (128kbit_AAC).mp3", title: "La Gloria Eres Tu" },
+  { src: "ana/Luis Miguel - 'Tengo Todo Excepto A Ti' (Video Oficial) (128kbit_AAC).mp3", title: "Tengo Todo Excepto A Ti" },
+  { src: "ana/Miguel Bosé & Ximena Sariñana - Aire Soy (Videoclip oficial) (128kbit_AAC).mp3", title: "Aire Soy" },
+  { src: "ana\Pedro Fernández - Amarte A La Antigua (128kbit_AAC).mp3", title: "Amarte A La Antigua" },
+  { src: "ana/Quiero Perderme Contigo (128kbit_AAC).mp3", title: "Quiero Perderme Contigo" },
+  { src: "ana/TOPO GIGIO © - Hasta mañana - A la Camita (128kbit_AAC).mp3", title: "Hasta mañana" }
+];
+
+
+const placeholderSVG = (text, bg, fg,png) => {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100%' fill='${bg}'/><g><text x='50%' y='50%' font-size='36' fill='${fg}' text-anchor='middle' dominant-baseline='middle' font-family='Verdana'>${text}</text></g></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+};
+const placeholderList = [
+  placeholderSVG("","#fff7f0","#2b6b2b"),
+  placeholderSVG("","#fffef0","#3b7f3b"),
+  placeholderSVG("","#fffaf0","#6b8a3b"),
+  placeholderSVG("","#f6fff8","#2e6b4a")
+];
+
+
+/* DOM Refs */
+const platter = document.getElementById('platter');
+const labelImg = document.getElementById('labelImg');
+const tonearm = document.getElementById('tonearm');
+const btnPlay = document.getElementById('btnPlay');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+const btnShuffle = document.getElementById('btnShuffle');
+const iconPlay = document.getElementById('iconPlay');
+const iconPause = document.getElementById('iconPause');
+const songSelect = document.getElementById('songSelect');
+const progress = document.getElementById('progress');
+const timeLabel = document.getElementById('timeLabel');
+const loadingOverlay = document.getElementById('loading');
+const sensKnob = document.getElementById('sensKnob');
+const volKnob = document.getElementById('volKnob');
+const volMark = volKnob.querySelector('.mark');
+
+const imagesRow = document.getElementById('imagesRow');
+const imgItems = document.querySelectorAll('.img-item img');
+
+const toggleWrite = document.getElementById('toggleWrite');
+const writeArea = document.getElementById('writeArea');
+const userMessage = document.getElementById('userMessage');
+const saveMsg = document.getElementById('saveMsg');
+const clearMsg = document.getElementById('clearMsg');
+
+const rocket = document.getElementById('rocket');
+
+/* Audio state */
+let audio = new Audio();
+audio.crossOrigin = "anonymous";
+let audioCtx = null, analyser = null, dataArray = null, sourceNode = null;
+let isPlaying = false, currentIndex = 0, shuffle = false;
+let sensitivity = 1.0; // default knob sensitivity multiplier
+let volumeVal = 0.85; // default volume
+let lastShuffled = null; // to avoid repeats
+
+/* Fill song selector with titles */
+function populateSongSelect(){
+  songSelect.innerHTML = '';
+  const empty = document.createElement('option'); empty.value=''; empty.textContent='🎵 Selecciona canción'; songSelect.appendChild(empty);
+  tracks.forEach((t,i)=>{
+    const o = document.createElement('option'); o.value = i; o.textContent = t.title || t.src; songSelect.appendChild(o);
+  });
+}
+populateSongSelect();
+
+/* Init images placeholders */
+imgItems.forEach((img,i)=> img.src = placeholderList[i%placeholderList.length]);
+labelImg.src = placeholderList[0];
+
+/* =====================
+   AudioContext & Analyser
+   ===================== */
+function ensureAudioContext(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    sourceNode = audioCtx.createMediaElementSource(audio);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    sourceNode.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    requestAnimationFrame(animateTonearm);
+  }
+}
+
+/* Toggle loading overlay */
+function showLoading(show){
+  if(show){ loadingOverlay.classList.add('show'); loadingOverlay.setAttribute('aria-hidden','false'); }
+  else { loadingOverlay.classList.remove('show'); loadingOverlay.setAttribute('aria-hidden','true'); }
+}
+
+/* =====================
+   Player functions (load / play / pause / next / prev)
+   ===================== */
+function loadTrack(index, autoplay = false){
+  if(index < 0) index = 0;
+  if(index >= tracks.length) index = 0;
+  currentIndex = index;
+  const t = tracks[currentIndex];
+  showLoading(true);
+  // set src then try to load
+  audio.src = t.src;
+  audio.load();
+  // set label image placeholder based on index (you will replace with real images later)
+  labelImg.src = placeholderList[currentIndex % placeholderList.length];
+  songSelect.value = currentIndex;
+  // ensure analyser will be created on first play
+  if(autoplay) playTrack();
+  // hide loading after canplaythrough or short timeout
+  const onLoaded = ()=>{
+    showLoading(false);
+    audio.removeEventListener('canplaythrough', onLoaded);
+  };
+  audio.addEventListener('canplaythrough', onLoaded);
+  // fallback hide after 4s
+  setTimeout(()=> showLoading(false), 4200);
+}
+
+function playTrack(){
+  ensureAudioContext();
+  if(audioCtx.state === 'suspended'){
+    audioCtx.resume();
+  }
+
+  audio.volume = volumeVal;
+  audio.play().then(()=>{
+    isPlaying = true;
+    setPlayingUI(true);
+    platter.classList.add('playing');
+  }).catch(()=>{
+    isPlaying = false;
+    setPlayingUI(false);
+  });
+}
+
+function pauseTrack(){
+  audio.pause();
+  if(audioCtx && audioCtx.state === 'running'){
+    audioCtx.suspend();
+  }
+  isPlaying = false;
+  setPlayingUI(false);
+  platter.classList.remove('playing');
+}
+
+
+function togglePlay(){ if(isPlaying) pauseTrack(); else playTrack(); }
+
+function prevTrack(){
+  if(audio.currentTime > 3){ audio.currentTime = 0; return; }
+  currentIndex = (currentIndex - 1 + tracks.length) % tracks.length;
+  loadTrack(currentIndex, true);
+}
+
+function nextTrack(){
+  if(shuffle){
+    // pick random not equal to lastShuffled and not equal to currentIndex ideally
+    let pick;
+    const attempts = 8;
+    for(let i=0;i<attempts;i++){
+      pick = Math.floor(Math.random()*tracks.length);
+      if(pick !== currentIndex && pick !== lastShuffled) break;
+    }
+    lastShuffled = pick;
+    currentIndex = pick;
+  } else {
+    currentIndex = (currentIndex + 1) % tracks.length;
+  }
+  loadTrack(currentIndex, true);
+}
+
+/* shuffle toggle */
+function toggleShuffle(){ shuffle = !shuffle; btnShuffle.style.boxShadow = shuffle ? "0 10px 18px rgba(105,175,85,0.18)" : ""; btnShuffle.style.transform = shuffle ? "scale(1.02)" : ""; }
+
+/* events */
+btnPlay.addEventListener('click', togglePlay);
+btnPrev.addEventListener('click', prevTrack);
+btnNext.addEventListener('click', nextTrack);
+btnShuffle.addEventListener('click', toggleShuffle);
+songSelect.addEventListener('change', e=>{
+  if(e.target.value === '') return;
+  const val = parseInt(e.target.value);
+  loadTrack(val, true);
+});
+
+/* progress interactions */
+progress.addEventListener('input', e=>{
+  if(!isNaN(audio.duration) && audio.duration > 0){
+    const pct = parseFloat(e.target.value);
+    audio.currentTime = (pct/100) * audio.duration;
+    positionTonearmByProgress(pct/100);
+  }
+});
+
+/* audio time updates */
+audio.addEventListener('timeupdate', ()=>{
+  if(!isNaN(audio.duration) && audio.duration > 0){
+    const pct = (audio.currentTime / audio.duration) * 100;
+    progress.value = pct;
+    timeLabel.textContent = formatTime(audio.currentTime);
+    positionTonearmByProgress(pct/100);
+  }
+});
+audio.addEventListener('ended', ()=> nextTrack());
+
+function formatTime(s){
+  s = Math.floor(s || 0);
+  const m = Math.floor(s/60); const sec = s%60;
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+}
+
+/* =====================
+   Tonearm movement + analyser-based micro-movement
+   - Only wobble when playing & analyser available
+   - Sensitivity knob scales wobble
+   ===================== */
+const ARM_START = -40, ARM_END = 18;
+function setTonearmToStart(){ tonearm.style.transform = `rotate(${ARM_START}deg)`; }
+setTonearmToStart();
+
+function positionTonearmByProgress(ratio){
+  ratio = Math.min(1, Math.max(0, ratio));
+  const eased = Math.pow(ratio, 0.98);
+  const angle = ARM_START + (ARM_END - ARM_START) * eased;
+  tonearm.style.transform = `rotate(${angle}deg)`;
+}
+
+/* animate tonearm (with analyser) */
+function animateTonearm(){
+  requestAnimationFrame(animateTonearm);
+  if(!analyser || !isPlaying) return; // only update wobble if playing
+  analyser.getByteFrequencyData(dataArray);
+  let sum = 0;
+  for(let i=0;i<dataArray.length;i++) sum += dataArray[i]*dataArray[i];
+  const rms = Math.sqrt(sum/dataArray.length)/255; // 0..1
+  const wobble = rms * (2.2 * sensitivity);
+  let baseRatio = 0;
+  if(!isNaN(audio.duration) && audio.duration>0) baseRatio = audio.currentTime / audio.duration;
+  const eased = Math.pow(baseRatio, 0.98);
+  const baseAngle = ARM_START + (ARM_END - ARM_START) * eased;
+  const t = performance.now()/700;
+  const wob = Math.sin(t) * wobble;
+  const final = baseAngle + wob;
+  tonearm.style.transform = `rotate(${final}deg)`;
+}
+
+/* =====================
+   Knob interactivity (sensitivity & volume)
+   - drag vertical to change value
+   ===================== */
+(function setupKnobs(){
+  // sensitivity: 0.3 .. 3.0
+  let drag = false, startY=0, startVal=1.0;
+  sensKnob.addEventListener('pointerdown', e=>{
+    e.preventDefault(); drag=true; startY=e.clientY; startVal=sensitivity; sensKnob.setPointerCapture(e.pointerId);
+  });
+  window.addEventListener('pointermove', e=>{
+    if(!drag) return;
+    const dy = startY - e.clientY; const delta = dy / 120; let v = Math.min(3.0, Math.max(0.3, startVal + delta));
+    sensitivity = Math.round(v*100)/100;
+    const angle = (sensitivity - 0.3) / (3.0 - 0.3) * 260 - 130;
+    sensKnob.style.transform = `rotate(${angle}deg)`;
+    sensKnob.title = "Sensibilidad: " + sensitivity.toFixed(2);
+  });
+  window.addEventListener('pointerup', ()=> drag=false);
+
+  // volume knob: 0..1
+  let vdrag=false, vstartY=0, vstart=volumeVal;
+  volKnob.addEventListener('pointerdown', e=>{
+    e.preventDefault(); vdrag=true; vstartY=e.clientY; vstart=volumeVal; volKnob.setPointerCapture(e.pointerId);
+  });
+  window.addEventListener('pointermove', e=>{
+    if(!vdrag) return;
+    const dy = vstartY - e.clientY; const delta = dy / 120; let v = Math.min(1.0, Math.max(0.02, vstart + delta));
+    volumeVal = Math.round(v*100)/100; audio.volume = volumeVal;
+    // rotate visual mark
+    const ang = (volumeVal) * 260 - 130;
+    volKnob.style.transform = `rotate(${ang}deg)`;
+    volKnob.title = "Volumen: " + Math.round(volumeVal*100) + "%";
+    // visual brightness of perilla
+    volKnob.style.boxShadow = `0 10px 20px rgba(95,160,60,${0.06 + volumeVal*0.12})`;
+  });
+  window.addEventListener('pointerup', ()=> vdrag=false);
+})();
+
+/* =====================
+   Platter: ensure only rotateZ (we use CSS .playing class)
+   - toggled in setPlayingUI
+   ===================== */
+function setPlayingUI(play){
+  if(play){
+    iconPlay.style.display='none'; iconPause.style.display='block';
+    platter.classList.add('playing');
+  } else {
+    iconPlay.style.display='block'; iconPause.style.display='none';
+    platter.classList.remove('playing');
+  }
+}
+
+/* =====================
+   Heart drawing (step-by-step) + typewriter text (inside canvas)
+   ===================== */
+const heartCanvas = document.getElementById('heartCanvas'), hCtx = heartCanvas.getContext('2d');
+heartCanvas.width = 400; heartCanvas.height = 340;
+hCtx.lineWidth = 3; hCtx.strokeStyle = '#d63a6d'; hCtx.lineJoin='round'; hCtx.lineCap='round';
+let tHeart = 0;
+function drawHeartStep(){
+  if(tHeart === 0){ hCtx.clearRect(0,0,heartCanvas.width, heartCanvas.height); hCtx.beginPath(); }
+  const cx = heartCanvas.width/2; const cy = heartCanvas.height/2 + 6;
+  const scale = heartCanvas.width/48;
+  const x = 16*Math.pow(Math.sin(tHeart),3);
+  const y = 13*Math.cos(tHeart)-5*Math.cos(2*tHeart)-2*Math.cos(3*tHeart)-Math.cos(4*tHeart);
+  const px = cx + x*scale; const py = cy - y*scale;
+  if(tHeart===0) hCtx.moveTo(px,py); else hCtx.lineTo(px,py);
+  hCtx.stroke();
+  tHeart += 0.03;
+  if(tHeart < Math.PI*2 + 0.03) requestAnimationFrame(drawHeartStep);
+  else {
+    hCtx.fillStyle = 'rgba(214,58,109,0.08)';
+    hCtx.globalCompositeOperation = 'destination-over';
+    hCtx.beginPath();
+    let steps=360;
+    for(let i=0;i<=steps;i++){
+      const tt = i/steps * Math.PI*2;
+      const xx = 16*Math.pow(Math.sin(tt),3);
+      const yy = 13*Math.cos(tt)-5*Math.cos(2*tt)-2*Math.cos(3*tt)-Math.cos(4*tt);
+      const ppx = cx + xx*scale; const ppy = cy - yy*scale;
+      if(i===0) hCtx.moveTo(ppx,ppy); else hCtx.lineTo(ppx,ppy);
+    }
+    hCtx.closePath(); hCtx.fill(); hCtx.globalCompositeOperation = 'source-over';
+    // start typewriter (inside canvas) for main phrase
+    typewriterCanvas("Te quiero hasta el infinito y muchísimo más allá");
+  }
+}
+drawHeartStep();
+
+function typewriterCanvas(text){
+  const x = heartCanvas.width/2; const y = heartCanvas.height - 20;
+  hCtx.font = "18px Georgia, serif"; hCtx.textAlign = "center"; hCtx.fillStyle = "#4b2740";
+  let idx = 0;
+  function step(){
+    hCtx.clearRect(0, heartCanvas.height-40, heartCanvas.width, 40);
+    const substr = text.slice(0, idx);
+    hCtx.fillText(substr, x, y);
+    idx++;
+    if(idx <= text.length) setTimeout(step, 45);
+  }
+  step();
+}
+
+/* =====================
+   Boat animation (canvas)
+   ===================== */
+const boatCanvas = document.getElementById('boatCanvas'), bCtx = boatCanvas.getContext('2d');
+boatCanvas.width = 640; boatCanvas.height = 140;
+function drawBoatFrame(t){
+  bCtx.clearRect(0,0,boatCanvas.width,boatCanvas.height);
+  const g = bCtx.createLinearGradient(0,0,0,boatCanvas.height);
+  g.addColorStop(0, 'rgba(200,245,220,0.12)');
+  g.addColorStop(1, 'rgba(175,235,200,0.04)');
+  bCtx.fillStyle = g; bCtx.fillRect(0,0,boatCanvas.width,boatCanvas.height);
+  bCtx.strokeStyle = 'rgba(26,115,51,0.12)'; bCtx.lineWidth = 2;
+  for(let i=0;i<2;i++){
+    bCtx.beginPath();
+    const amp = 6 + i*3; const freq = 0.008 + i*0.004;
+    for(let x=0;x<boatCanvas.width;x++){
+      const y = 80 + Math.sin((x * freq) + t*0.002 + i) * amp;
+      if(x===0) bCtx.moveTo(x,y); else bCtx.lineTo(x,y);
+    }
+    bCtx.stroke();
+  }
+  const startX = boatCanvas.width * 0.08; const endX = boatCanvas.width * 0.82;
+  const progress = (t % 6000) / 6000;
+  const x = startX + (endX - startX) * progress;
+  const bob = Math.sin(progress * Math.PI * 2) * 6;
+  bCtx.save(); bCtx.translate(x, 72 + bob); bCtx.rotate(Math.sin(progress*Math.PI*2)*0.04);
+  bCtx.beginPath(); bCtx.moveTo(-22,6); bCtx.lineTo(0,18); bCtx.lineTo(22,6); bCtx.closePath();
+  bCtx.fillStyle = 'rgba(255,245,235,0.95)'; bCtx.fill(); bCtx.strokeStyle='rgba(200,140,110,0.7)'; bCtx.lineWidth=1.2; bCtx.stroke();
+  bCtx.beginPath(); bCtx.moveTo(0,-12); bCtx.lineTo(0,18); bCtx.lineTo(12,4); bCtx.closePath();
+  bCtx.fillStyle='rgba(255,250,240,0.95)'; bCtx.fill(); bCtx.stroke();
+  bCtx.restore();
+}
+let boatStart = performance.now();
+function animateBoat(now){ drawBoatFrame(now - boatStart); requestAnimationFrame(animateBoat); }
+requestAnimationFrame(animateBoat);
+
+/* =====================
+   Floating bubbles + flowers
+   ===================== */
+const floatChoices = ['💗','🌸','🌿','💚','🌼','💕','🍏','🍃','🍀'];
+function spawnFloating(){
+  const el = document.createElement('div'); el.className='floating';
+  el.style.left = (Math.random()*92) + 'vw';
+  el.style.fontSize = (12 + Math.random()*36) + 'px';
+  el.style.animationDuration = (4 + Math.random()*6) + 's';
+  el.textContent = floatChoices[Math.floor(Math.random()*floatChoices.length)];
+  document.body.appendChild(el);
+  setTimeout(()=> el.remove(), 10000);
+}
+setInterval(spawnFloating, 900);
+
+/* =====================
+   Image placeholders click -> set label
+   ===================== */
+imgItems.forEach((img, idx) => {
+  img.addEventListener('click', ()=>{
+    labelImg.src = img.src;
+    platter.animate([{transform:'scale(1)'},{transform:'scale(.997)'},{transform:'scale(1)'}],{duration:380});
+  });
+});
+
+/* =====================
+   Write message UI (toggle & storage)
+   ===================== */
+toggleWrite.addEventListener('click', ()=>{
+  if(writeArea.style.display === 'flex'){ writeArea.style.display = 'none'; }
+  else {
+    writeArea.style.display = 'flex';
+    writeArea.classList.add('appear');
+    const saved = localStorage.getItem('romantic_message_v2') || '';
+    userMessage.value = saved;
+  }
+});
+
+saveMsg.addEventListener('click', ()=>{
+  const txt = userMessage.value.trim();
+  localStorage.setItem('romantic_message_v2', txt);
+  saveMsg.textContent = 'Guardado ✓';
+  setTimeout(()=> saveMsg.textContent = 'Guardar', 1200);
+});
+clearMsg.addEventListener('click', ()=>{
+  userMessage.value = '';
+  localStorage.removeItem('romantic_message_v2');
+  clearMsg.textContent = 'Borrado ✓';
+  setTimeout(()=> clearMsg.textContent = 'Borrar', 1200);
+});
+
+/* =====================
+   Bubbles spawner (apple) - separate container to ensure z-index
+   ===================== */
+const bubblesContainer = document.getElementById('bubblesContainer');
+function spawnAppleBubble(){
+  const e = document.createElement('div'); e.className = 'bubble'; e.textContent = '🍏';
+  e.style.position = 'fixed'; e.style.left = (Math.random()*92)+'vw'; e.style.top = (-6 - Math.random()*6) + 'vh';
+  e.style.fontSize = (16 + Math.random()*36) + 'px';
+  e.style.animationDuration = (5 + Math.random()*6) + 's';
+  bubblesContainer.appendChild(e);
+  setTimeout(()=> e.remove(), 12000);
+}
+setInterval(spawnAppleBubble, 1000);
+
+/* =====================
+   Keyboard & resume audio context on first gesture
+   ===================== */
+window.addEventListener('keydown', (e)=>{
+  if(e.code === 'Space'){ e.preventDefault(); togglePlay(); }
+  if(e.code === 'ArrowRight') nextTrack();
+  if(e.code === 'ArrowLeft') prevTrack();
+});
+
+['click','touchstart','keydown'].forEach(ev=>{
+  window.addEventListener(ev, async function resumeOnce(){
+    if(audioCtx && audioCtx.state === 'suspended') await audioCtx.resume().catch(()=>{});
+    window.removeEventListener(ev, resumeOnce);
+  }, { once:true });
+});
+
+/* =====================
+   Initialize: populate messages and default UI
+   ===================== */
+const messages = [
+  "Tu risa convierte cualquier día gris en mañana de sol ☀️",
+  "Eres la calma que se queda cuando se va el ruido del mundo",
+  "Quiero dibujar contigo tardes infinitas 🖍️",
+  "Tus ojos guardan constelaciones que aún no he aprendido a leer"
+];
+const messagesBox = document.getElementById('imagesRow').parentElement.querySelector('.small') || null; // not used
+// inject messages in side panel
+const messagesContainer = document.querySelector('.messages') || null;
+if(messagesContainer){
+  messages.forEach((m,i)=>{
+    const d = document.createElement('div'); d.className='msg'; d.textContent = m;
+    const side = document.getElementById('imagesRow').parentElement;
+    // place under .messages container
+  });
+}
+// actually add messages (we use existing side .messages area)
+const messagesArea = document.getElementById('imagesRow').closest('.player').querySelector('.small'); // fallback not necessary
+
+// The page's right panel already has small text; but previously we had a `.messages` element in the original layout.
+// Insert messages into the ".side" messages container (right panel)
+(function fillSideMessages(){
+  const target = document.getElementById('imagesRow').parentElement.parentElement.querySelector('.messages');
+  if(target){
+    messages.forEach((m,i)=>{
+      const el = document.createElement('div'); el.className = 'msg'; el.textContent = m;
+      target.appendChild(el);
+      setTimeout(()=> el.classList.add('appear'), 450 + i*600);
+    });
+  }
+})();
+ 
+/* Load first track prepared (no autoplay) */
+loadTrack(0, false);
+toggleWrite.style.display = 'none';
+writeArea.style.display = 'none';
+toggleWrite.onclick = null;
+saveMsg.onclick = null;
+clearMsg.onclick = null;
+
+/* END of script */
+</script>
+
+</body>
+</html>
